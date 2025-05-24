@@ -1,54 +1,54 @@
 package aviel.scratch.active_backup.world_events.competition_events;
 
-import aviel.scratch.active_backup.world_events.Events;
+import aviel.scratch.active_backup.world_events.WorldEvents;
 import aviel.scratch.active_backup.competition_events.StartAsWeak;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class EventsStartAsWeak implements Events {
+public class WorldEventsStartAsWeak implements WorldEvents {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final StartAsWeak startAsWeak;
     private final EventConcreteData data;
 
-    public EventsStartAsWeak(StartAsWeak startAsWeak, EventConcreteData data) {
+    public WorldEventsStartAsWeak(StartAsWeak startAsWeak, EventConcreteData data) {
         this.startAsWeak = startAsWeak;
         this.data = data;
     }
 
     @Override
-    public Events onPeerUpdate(long id, int strength) {
+    public WorldEvents onPeerUpdate(long id, int strength) {
         LOGGER.info("onPeerUpdate({}, {})", id, strength);
         data.updatePeer(id, strength);
         if (data.amStrongest()) {
-            return new EventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
+            return new WorldEventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
         }
         return this;
     }
 
     @Override
-    public Events onPeerLost(long id) {
+    public WorldEvents onPeerLost(long id) {
         LOGGER.info("onPeerLost({})", id);
         data.removePeer(id);
         if (data.amStrongest()) {
-            return new EventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
+            return new WorldEventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
         }
         return this;
     }
 
     @Override
-    public Events onStrengthChange(int newStrength) {
+    public WorldEvents onStrengthChange(int newStrength) {
         LOGGER.info("onStrengthChange({})", newStrength);
         data.updateSelf(newStrength);
         if (data.amStrongest()) {
-            return new EventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
+            return new WorldEventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
         }
         return this;
     }
 
     @Override
-    public Events onWakeupCall() {
+    public WorldEvents onWakeupCall() {
         LOGGER.info("onWakeupCall()");
-        return new EventsWokeAsWeak(startAsWeak.onWakeupCall(), data);
+        return new WorldEventsWokeAsWeak(startAsWeak.onWakeupCall(), data);
     }
 }

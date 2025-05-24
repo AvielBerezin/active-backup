@@ -1,6 +1,6 @@
 package aviel.scratch.active_backup;
 
-import aviel.scratch.active_backup.world_events.StatefulEvents;
+import aviel.scratch.active_backup.world_events.StatefulWorldEvents;
 import aviel.scratch.active_backup.active_backup_events.StatefulActiveBackup;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import aviel.scratch.network_api.TopicListener;
@@ -14,14 +14,14 @@ import java.util.concurrent.*;
 public class ActiveBackupProvider implements AutoCloseable {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final StatefulEvents events;
+    private final StatefulWorldEvents events;
     private final TopicReader topicReader;
     private final ScheduledFuture<?> wakeupCallTask;
     private final ExecutorService activeBackupEventsExecutor;
     private final ScheduledExecutorService wakeupCallScheduler;
 
     public ActiveBackupProvider(NetworkApi networkApi, long id, int strength, StatefulActiveBackup activeBackupHandler) {
-        events = new StatefulEvents(networkApi.openActiveBackupCompetitionWriter(), id, strength, activeBackupHandler);
+        events = new StatefulWorldEvents(networkApi.openActiveBackupCompetitionWriter(), id, strength, activeBackupHandler);
         activeBackupEventsExecutor = Executors.newSingleThreadExecutor(r -> {
             Thread thread = new Thread(r);
             thread.setName("activeBackupEventsThread");
