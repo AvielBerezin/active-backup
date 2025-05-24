@@ -1,10 +1,10 @@
-package aviel.scratch.active_backup.abstract_events;
+package aviel.scratch.active_backup.world_events;
 
-import aviel.scratch.active_backup.abstract_events.concrete_events.EventConcreteData;
-import aviel.scratch.active_backup.abstract_events.concrete_events.EventsStartAsStrongest;
+import aviel.scratch.active_backup.world_events.competition_events.EventConcreteData;
+import aviel.scratch.active_backup.world_events.competition_events.EventsStartAsStrongest;
 import aviel.scratch.active_backup.active_backup_events.StatefulActiveBackup;
 import aviel.scratch.active_backup.active_backup_events.stateful.BackupStateful;
-import aviel.scratch.active_backup.concrete_events.active_backup_events.StartAsStrongestBackup;
+import aviel.scratch.active_backup.competition_events.active_backup_events.StartAsStrongestBackup;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import aviel.scratch.network_api.TopicWriter;
 

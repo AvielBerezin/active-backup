@@ -1,18 +1,18 @@
-package aviel.scratch.active_backup.abstract_events.concrete_events;
+package aviel.scratch.active_backup.world_events.competition_events;
 
-import aviel.scratch.active_backup.abstract_events.Events;
-import aviel.scratch.active_backup.concrete_events.WokeAsStrongest;
+import aviel.scratch.active_backup.world_events.Events;
+import aviel.scratch.active_backup.competition_events.StartAsWeak;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class EventsWokeAsStrongest implements Events {
+public class EventsStartAsWeak implements Events {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final WokeAsStrongest wokeAsStrongest;
+    private final StartAsWeak startAsWeak;
     private final EventConcreteData data;
 
-    public EventsWokeAsStrongest(WokeAsStrongest wokeAsStrongest, EventConcreteData data) {
-        this.wokeAsStrongest = wokeAsStrongest;
+    public EventsStartAsWeak(StartAsWeak startAsWeak, EventConcreteData data) {
+        this.startAsWeak = startAsWeak;
         this.data = data;
     }
 
@@ -20,8 +20,8 @@ public class EventsWokeAsStrongest implements Events {
     public Events onPeerUpdate(long id, int strength) {
         LOGGER.info("onPeerUpdate({}, {})", id, strength);
         data.updatePeer(id, strength);
-        if (!data.amStrongest()) {
-            return new EventsWokeAsWeak(wokeAsStrongest.onMetStronger(), data);
+        if (data.amStrongest()) {
+            return new EventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
         }
         return this;
     }
@@ -30,15 +30,18 @@ public class EventsWokeAsStrongest implements Events {
     public Events onPeerLost(long id) {
         LOGGER.info("onPeerLost({})", id);
         data.removePeer(id);
-        return new EventsWokeAsStrongest(wokeAsStrongest, data);
+        if (data.amStrongest()) {
+            return new EventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
+        }
+        return this;
     }
 
     @Override
     public Events onStrengthChange(int newStrength) {
         LOGGER.info("onStrengthChange({})", newStrength);
         data.updateSelf(newStrength);
-        if (!data.amStrongest()) {
-            return new EventsWokeAsWeak(wokeAsStrongest.onMetStronger(), data);
+        if (data.amStrongest()) {
+            return new EventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
         }
         return this;
     }
@@ -46,6 +49,6 @@ public class EventsWokeAsStrongest implements Events {
     @Override
     public Events onWakeupCall() {
         LOGGER.info("onWakeupCall()");
-        return this;
+        return new EventsWokeAsWeak(startAsWeak.onWakeupCall(), data);
     }
 }

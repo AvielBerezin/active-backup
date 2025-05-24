@@ -1,4 +1,4 @@
-package aviel.scratch.active_backup.concrete_events;
+package aviel.scratch.active_backup.competition_events;
 
 public interface WokeAsWeak {
     WokeAsStrongest onAmStrongest();

@@ -1,6 +1,6 @@
 package aviel.scratch.active_backup;
 
-import aviel.scratch.active_backup.abstract_events.StatefulEvents;
+import aviel.scratch.active_backup.world_events.StatefulEvents;
 import aviel.scratch.active_backup.active_backup_events.StatefulActiveBackup;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import aviel.scratch.network_api.TopicListener;

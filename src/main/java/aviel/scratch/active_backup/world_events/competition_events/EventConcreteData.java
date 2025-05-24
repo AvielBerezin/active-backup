@@ -1,4 +1,4 @@
-package aviel.scratch.active_backup.abstract_events.concrete_events;
+package aviel.scratch.active_backup.world_events.competition_events;
 
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import aviel.scratch.network_api.TopicWriter;
