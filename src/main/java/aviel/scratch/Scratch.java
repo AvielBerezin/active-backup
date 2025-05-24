@@ -31,7 +31,7 @@ public class Scratch {
             networkApiMock.triggerOnReceivedMessage(new ActiveBackupCompetition(1001L, 5, "site1"));
             networkApiMock.triggerOnReceivedMessage(new ActiveBackupCompetition(1002L, 15, "site1"));
             Thread.sleep(6000);
-            abProvider.modifyStrength(20);
+            abProvider.userStrengthChange(20);
             Thread.sleep(1000);
             networkApiMock.triggerOnReceivedMessage(new ActiveBackupCompetition(1002L, 30, "site1"));
             Thread.sleep(1000);

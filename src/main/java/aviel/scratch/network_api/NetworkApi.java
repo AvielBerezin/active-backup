@@ -7,6 +7,10 @@ public class NetworkApi {
         return new TopicReader();
     }
 
+    public TopicReader openHandOverProvider(Runnable handOverImplementation) {
+        return new TopicReader();
+    }
+
     public TopicWriter<ActiveBackupCompetition> openActiveBackupCompetitionWriter() {
         return new TopicWriter<>();
     }

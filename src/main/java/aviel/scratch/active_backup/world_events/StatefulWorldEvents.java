@@ -1,10 +1,11 @@
 package aviel.scratch.active_backup.world_events;
 
-import aviel.scratch.active_backup.world_events.competition_events.EventConcreteData;
+import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
 import aviel.scratch.active_backup.world_events.competition_events.WorldEventsDormantAsStrongest;
 import aviel.scratch.active_backup.active_backup_events.StatefulActiveBackup;
 import aviel.scratch.active_backup.active_backup_events.stateful.BackupStateful;
 import aviel.scratch.active_backup.competition_events.active_backup_events.DormantAsStrongestBackup;
+import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 
 public class StatefulWorldEvents {
@@ -22,11 +23,15 @@ public class StatefulWorldEvents {
         worldEvents = worldEvents.onPeerLost(id);
     }
 
-    public void onStrengthChange(int newStrength) {
-        worldEvents = worldEvents.onStrengthChange(newStrength);
+    public void onStrengthChange(StrengthModification modification) {
+        worldEvents = worldEvents.onStrengthChange(modification);
     }
 
     public void onWakeupCall() {
         worldEvents = worldEvents.onWakeupCall();
+    }
+
+    public void onTakeANap() {
+        worldEvents = worldEvents.onTakeANap();
     }
 }

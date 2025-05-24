@@ -1,4 +1,4 @@
-package aviel.scratch.active_backup.world_events.competition_events;
+package aviel.scratch.active_backup.world_events.competition_events.data;
 
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import aviel.scratch.network_api.TopicWriter;
@@ -37,9 +37,9 @@ public class EventConcreteData {
         }
     }
 
-    public void updateSelf(int strength) {
-        this.strength = strength;
-        activeBackupCompetitionTopicWriter.sendMessage(new ActiveBackupCompetition(id, strength, site));
+    public void updateSelf(StrengthModification strength) {
+        this.strength = strength.modify(this.strength);
+        activeBackupCompetitionTopicWriter.sendMessage(new ActiveBackupCompetition(id, this.strength, site));
     }
 
     public boolean amStrongest() {
