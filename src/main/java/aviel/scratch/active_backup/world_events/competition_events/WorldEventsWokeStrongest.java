@@ -1,21 +1,21 @@
 package aviel.scratch.active_backup.world_events.competition_events;
 
+import aviel.scratch.active_backup.competition_events.WokeStrongest;
 import aviel.scratch.active_backup.world_events.WorldEvents;
-import aviel.scratch.active_backup.competition_events.WokeAsStrongest;
 import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class WorldEventsWokeAsStrongest implements WorldEvents {
+public class WorldEventsWokeStrongest implements WorldEvents {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final WokeAsStrongest wokeAsStrongest;
+    private final WokeStrongest wokeStrongest;
     private final EventConcreteData data;
 
-    public WorldEventsWokeAsStrongest(WokeAsStrongest wokeAsStrongest, EventConcreteData data) {
-        this.wokeAsStrongest = wokeAsStrongest;
+    public WorldEventsWokeStrongest(WokeStrongest wokeStrongest, EventConcreteData data) {
+        this.wokeStrongest = wokeStrongest;
         this.data = data;
     }
 
@@ -24,7 +24,7 @@ public class WorldEventsWokeAsStrongest implements WorldEvents {
         LOGGER.info("onPeerUpdate({})", peer);
         data.updatePeer(peer);
         if (!data.amStrongest()) {
-            return new WorldEventsWokeAsWeak(wokeAsStrongest.onMetStronger(), data);
+            return new WorldEventsWokeWeak(wokeStrongest.onMetStronger(), data);
         }
         return this;
     }
@@ -33,7 +33,7 @@ public class WorldEventsWokeAsStrongest implements WorldEvents {
     public WorldEvents onPeerLost(long id) {
         LOGGER.info("onPeerLost({})", id);
         data.removePeer(id);
-        return new WorldEventsWokeAsStrongest(wokeAsStrongest, data);
+        return new WorldEventsWokeStrongest(wokeStrongest, data);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class WorldEventsWokeAsStrongest implements WorldEvents {
         LOGGER.info("onStrengthChange({})", newStrength);
         data.updateSelf(newStrength);
         if (!data.amStrongest()) {
-            return new WorldEventsWokeAsWeak(wokeAsStrongest.onMetStronger(), data);
+            return new WorldEventsWokeWeak(wokeStrongest.onMetStronger(), data);
         }
         return this;
     }
