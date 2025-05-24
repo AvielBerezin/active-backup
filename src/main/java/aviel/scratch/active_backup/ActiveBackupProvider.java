@@ -6,10 +6,14 @@ import aviel.scratch.network_api.ActiveBackupCompetition;
 import aviel.scratch.network_api.TopicListener;
 import aviel.scratch.network_api.NetworkApi;
 import aviel.scratch.network_api.TopicReader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.*;
 
 public class ActiveBackupProvider implements AutoCloseable {
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private final StatefulEvents events;
     private final TopicReader topicReader;
     private final ScheduledFuture<?> wakeupCallTask;
@@ -43,7 +47,6 @@ public class ActiveBackupProvider implements AutoCloseable {
             @Override
             public void onWriterLost(long id) {
                 activeBackupEventsExecutor.execute(() -> {
-                    System.out.println("onInstanceLost");
                     events.onInstanceLost(id);
                 });
             }
@@ -58,7 +61,7 @@ public class ActiveBackupProvider implements AutoCloseable {
 
     @Override
     public void close() {
-        System.out.println("closing provider...");
+        LOGGER.info("closing provider...");
         topicReader.close();
         wakeupCallTask.cancel(false);
         wakeupCallScheduler.close();

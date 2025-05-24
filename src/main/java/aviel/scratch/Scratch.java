@@ -45,6 +45,10 @@ public class Scratch {
             Thread.sleep(1000);
             activeBackupCompetitionTopicListener.onReceivedMessage(new ActiveBackupCompetition(1002L, 10));
             Thread.sleep(1000);
+            activeBackupCompetitionTopicListener.onReceivedMessage(new ActiveBackupCompetition(1001L, 30));
+            Thread.sleep(1000);
+            activeBackupCompetitionTopicListener.onWriterLost(1001L);
+            Thread.sleep(1000);
         }
     }
 }
