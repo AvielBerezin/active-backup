@@ -53,7 +53,7 @@ public class Scratch {
             NetworkApiMock networkApiMock = NetworkApiMock.create();
             NetworkApi networkApi = networkApiMock.networkApi();
             String site = "";
-            long id = System.currentTimeMillis();
+            long id = 1000L;
             try (ActiveBackupProvider abProvider = new ActiveBackupProvider(networkApi, site, id, new StatefulActiveBackup() {
                 @Override
                 public void onBackup() {
@@ -70,7 +70,7 @@ public class Scratch {
                 networkApiMock.triggerOnReceivedMessage(new ActiveBackupCompetition(1002L, 10, "site1"));
                 Thread.sleep(6000);
                 networkApiMock.triggerHandOver();
-                Thread.sleep(1000);
+                Thread.sleep(6000);
             }
         }
     }
