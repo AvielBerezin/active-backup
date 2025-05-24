@@ -17,8 +17,8 @@ public class EventsWokeAsWeak implements Events {
     }
 
     @Override
-    public Events onInstanceUpdate(long id, int strength) {
-        LOGGER.info("onInstanceUpdate({}, {})", id, strength);
+    public Events onPeerUpdate(long id, int strength) {
+        LOGGER.info("onPeerUpdate({}, {})", id, strength);
         data.updatePeer(id, strength);
         if (data.amStrongest()) {
             return new EventsWokeAsStrongest(wokeAsWeak.onAmStrongest(), data);
@@ -27,8 +27,8 @@ public class EventsWokeAsWeak implements Events {
     }
 
     @Override
-    public Events onInstanceLost(long id) {
-        LOGGER.info("onInstanceLost({})", id);
+    public Events onPeerLost(long id) {
+        LOGGER.info("onPeerLost({})", id);
         data.removePeer(id);
         if (data.amStrongest()) {
             return new EventsWokeAsStrongest(wokeAsWeak.onAmStrongest(), data);

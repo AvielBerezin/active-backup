@@ -19,12 +19,12 @@ public class StatefulEvents {
                                             new EventConcreteData(id, strength, activeBackupCompetitionTopicWriter));
     }
 
-    public void onInstanceUpdate(long id, int strength) {
-        events = events.onInstanceUpdate(id, strength);
+    public void onPeerUpdate(long id, int strength) {
+        events = events.onPeerUpdate(id, strength);
     }
 
-    public void onInstanceLost(long id) {
-        events = events.onInstanceLost(id);
+    public void onPeerLost(long id) {
+        events = events.onPeerLost(id);
     }
 
     public void onStrengthChange(int newStrength) {

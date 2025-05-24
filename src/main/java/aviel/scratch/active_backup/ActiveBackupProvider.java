@@ -40,14 +40,14 @@ public class ActiveBackupProvider implements AutoCloseable {
             @Override
             public void onReceivedMessage(ActiveBackupCompetition message) {
                 activeBackupEventsExecutor.execute(() -> {
-                    events.onInstanceUpdate(message.id(), message.strength());
+                    events.onPeerUpdate(message.id(), message.strength());
                 });
             }
 
             @Override
             public void onWriterLost(long id) {
                 activeBackupEventsExecutor.execute(() -> {
-                    events.onInstanceLost(id);
+                    events.onPeerLost(id);
                 });
             }
         });
