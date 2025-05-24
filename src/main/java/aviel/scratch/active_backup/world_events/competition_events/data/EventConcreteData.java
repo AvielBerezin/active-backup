@@ -16,11 +16,10 @@ public class EventConcreteData {
 
     public EventConcreteData(String site,
                              long id,
-                             int strength,
                              TopicWriter<ActiveBackupCompetition> activeBackupCompetitionTopicWriter) {
         this.site = site;
         this.id = id;
-        this.strength = strength;
+        this.strength = 0;
         this.activeBackupCompetitionTopicWriter = activeBackupCompetitionTopicWriter;
         peersById = new HashMap<>();
         PeersByStrength = new TreeMap<>();
@@ -44,7 +43,7 @@ public class EventConcreteData {
 
     public boolean amStrongest() {
         Map.Entry<Integer, SortedSet<Long>> strongestPeers = PeersByStrength.lastEntry();
-        return strongestPeers.getKey() < strength || strongestPeers.getKey() == strength && strongestPeers.getValue().last() < id;
+        return strongestPeers == null || strongestPeers.getKey() < strength || strongestPeers.getKey() == strength && strongestPeers.getValue().last() < id;
     }
 
     public void removePeer(long id) {

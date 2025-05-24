@@ -25,8 +25,11 @@ public class ActiveBackupProvider implements AutoCloseable {
     private final ScheduledExecutorService wakeupCallScheduler;
     private final TopicReader handOverConsumer;
 
-    public ActiveBackupProvider(NetworkApi networkApi, String site, long id, int strength, StatefulActiveBackup activeBackupHandler) {
-        events = new StatefulWorldEvents(activeBackupHandler, new EventConcreteData(site, id, strength, networkApi.openActiveBackupCompetitionWriter()));
+    public ActiveBackupProvider(NetworkApi networkApi,
+                                String site,
+                                long id,
+                                StatefulActiveBackup activeBackupHandler) {
+        events = new StatefulWorldEvents(activeBackupHandler, new EventConcreteData(site, id, networkApi.openActiveBackupCompetitionWriter()));
         activeBackupEventsExecutor = Executors.newSingleThreadExecutor(r -> {
             Thread thread = new Thread(r);
             thread.setName("activeBackupEventsThread");
@@ -69,7 +72,7 @@ public class ActiveBackupProvider implements AutoCloseable {
         });
     }
 
-    public void userStrengthChange(int userStrengthComponent) {
+    public void changeStrength(int userStrengthComponent) {
         activeBackupEventsExecutor.execute(() -> {
             events.onStrengthChange(new StrengthUserModification(userStrengthComponent));
         });

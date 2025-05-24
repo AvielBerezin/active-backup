@@ -3,35 +3,53 @@ package aviel.scratch.network_api;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class NetworkApiMock {
-    private final AtomicReference<TopicListener<ActiveBackupCompetition>> box;
+    private final AtomicReference<Runnable> handOverUserAction;
+    private final AtomicReference<TopicListener<ActiveBackupCompetition>> activeBackupCompetition;
     private final NetworkApi networkApi;
 
-    private NetworkApiMock(AtomicReference<TopicListener<ActiveBackupCompetition>> box, NetworkApi networkApi) {
-        this.box = box;
+    private NetworkApiMock(NetworkApi networkApi,
+                           AtomicReference<TopicListener<ActiveBackupCompetition>> activeBackupCompetition,
+                           AtomicReference<Runnable> handOverUserAction) {
         this.networkApi = networkApi;
+        this.activeBackupCompetition = activeBackupCompetition;
+        this.handOverUserAction = handOverUserAction;
     }
 
     public static NetworkApiMock create() {
-        AtomicReference<TopicListener<ActiveBackupCompetition>> box = new AtomicReference<>();
+        AtomicReference<TopicListener<ActiveBackupCompetition>> activeBackupCompetition = new AtomicReference<>();
+        AtomicReference<Runnable> handOverUserAction = new AtomicReference<>();
         NetworkApi instance = new NetworkApi() {
             @Override
             public TopicReader openActiveBackupCompetitionReader(TopicListener<ActiveBackupCompetition> listener) {
-                if (box.get() != null) {
+                if (activeBackupCompetition.get() != null) {
                     throw new IllegalStateException("ActiveBackupCompetitionReader can only be opened once");
                 }
-                box.set(listener);
+                activeBackupCompetition.set(listener);
                 return super.openActiveBackupCompetitionReader(listener);
             }
+
+            @Override
+            public TopicReader openHandOverProvider(Runnable handOverImplementation) {
+                if (handOverUserAction.get() != null) {
+                    throw new IllegalStateException("HandOverProvider can only be opened once");
+                }
+                handOverUserAction.set(handOverImplementation);
+                return super.openHandOverProvider(handOverImplementation);
+            }
         };
-        return new NetworkApiMock(box, instance);
+        return new NetworkApiMock(instance, activeBackupCompetition, handOverUserAction);
     }
 
     public void triggerOnWriterLost(long id) {
-        box.get().onWriterLost(id);
+        activeBackupCompetition.get().onWriterLost(id);
     }
 
     public void triggerOnReceivedMessage(ActiveBackupCompetition message) {
-        box.get().onReceivedMessage(message);
+        activeBackupCompetition.get().onReceivedMessage(message);
+    }
+
+    public void triggerHandOver() {
+        handOverUserAction.get().run();
     }
 
     public NetworkApi networkApi() {
