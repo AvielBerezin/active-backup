@@ -51,4 +51,10 @@ public class WorldEventsWokeAsWeak implements WorldEvents {
         LOGGER.info("onWakeupCall()");
         return this;
     }
+
+    @Override
+    public WorldEvents onReceivedSwitchOver() {
+        LOGGER.info("onReceivedSwitchOver()");
+        return new WorldEventsDormantAsWeak(wokeAsWeak.onTakeANap(), data);
+    }
 }

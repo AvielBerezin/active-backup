@@ -48,4 +48,9 @@ public class WorldEventsWokeAsStrongest implements WorldEvents {
         LOGGER.info("onWakeupCall()");
         return this;
     }
+
+    @Override
+    public WorldEvents onReceivedSwitchOver() {
+        return this;
+    }
 }

@@ -1,18 +1,18 @@
 package aviel.scratch.active_backup.world_events.competition_events;
 
 import aviel.scratch.active_backup.world_events.WorldEvents;
-import aviel.scratch.active_backup.competition_events.StartAsStrongest;
+import aviel.scratch.active_backup.competition_events.DormantAsStrongest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class WorldEventsStartAsStrongest implements WorldEvents {
+public class WorldEventsDormantAsStrongest implements WorldEvents {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final StartAsStrongest startAsStrongest;
+    private final DormantAsStrongest dormantAsStrongest;
     private final EventConcreteData data;
 
-    public WorldEventsStartAsStrongest(StartAsStrongest startAsStrongest, EventConcreteData data) {
-        this.startAsStrongest = startAsStrongest;
+    public WorldEventsDormantAsStrongest(DormantAsStrongest dormantAsStrongest, EventConcreteData data) {
+        this.dormantAsStrongest = dormantAsStrongest;
         this.data = data;
     }
 
@@ -21,7 +21,7 @@ public class WorldEventsStartAsStrongest implements WorldEvents {
         LOGGER.info("onPeerUpdate({}, {})", id, strength);
         data.updatePeer(id, strength);
         if (!data.amStrongest()) {
-            return new WorldEventsStartAsWeak(startAsStrongest.onMetStronger(), data);
+            return new WorldEventsDormantAsWeak(dormantAsStrongest.onMetStronger(), data);
         }
         return this;
     }
@@ -30,7 +30,7 @@ public class WorldEventsStartAsStrongest implements WorldEvents {
     public WorldEvents onPeerLost(long id) {
         LOGGER.info("onPeerLost({})", id);
         data.removePeer(id);
-        return new WorldEventsStartAsStrongest(startAsStrongest, data);
+        return new WorldEventsDormantAsStrongest(dormantAsStrongest, data);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class WorldEventsStartAsStrongest implements WorldEvents {
         LOGGER.info("onStrengthChange({})", newStrength);
         data.updateSelf(newStrength);
         if (!data.amStrongest()) {
-            return new WorldEventsStartAsWeak(startAsStrongest.onMetStronger(), data);
+            return new WorldEventsDormantAsWeak(dormantAsStrongest.onMetStronger(), data);
         }
         return this;
     }
@@ -46,6 +46,11 @@ public class WorldEventsStartAsStrongest implements WorldEvents {
     @Override
     public WorldEvents onWakeupCall() {
         LOGGER.info("onWakeupCall()");
-        return new WorldEventsWokeAsStrongest(startAsStrongest.onWakeupCall(), data);
+        return new WorldEventsWokeAsStrongest(dormantAsStrongest.onWakeupCall(), data);
+    }
+
+    @Override
+    public WorldEvents onReceivedSwitchOver() {
+        return this;
     }
 }

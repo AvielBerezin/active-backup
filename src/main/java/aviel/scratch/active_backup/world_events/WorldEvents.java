@@ -5,4 +5,5 @@ public interface WorldEvents {
     WorldEvents onPeerLost(long id);
     WorldEvents onStrengthChange(int newStrength);
     WorldEvents onWakeupCall();
+    WorldEvents onReceivedSwitchOver();
 }
