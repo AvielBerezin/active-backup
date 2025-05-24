@@ -23,26 +23,24 @@ public class WorldEventsDormantWeak implements WorldEvents {
     public WorldEvents onPeerUpdate(ActiveBackupCompetition peer) {
         LOGGER.info("onPeerUpdate({})", peer);
         data.updatePeer(peer);
-        if (data.amStrongest()) {
-            return new WorldEventsDormantStrongest(dormantWeak.onAmStrongest(), data);
-        }
-        return this;
+        return decideFate();
     }
 
     @Override
     public WorldEvents onPeerLost(long id) {
         LOGGER.info("onPeerLost({})", id);
         data.removePeer(id);
-        if (data.amStrongest()) {
-            return new WorldEventsDormantStrongest(dormantWeak.onAmStrongest(), data);
-        }
-        return this;
+        return decideFate();
     }
 
     @Override
     public WorldEvents onStrengthChange(StrengthModification newStrength) {
         LOGGER.info("onStrengthChange({})", newStrength);
         data.updateSelf(newStrength);
+        return decideFate();
+    }
+
+    private WorldEvents decideFate() {
         if (data.amStrongest()) {
             return new WorldEventsDormantStrongest(dormantWeak.onAmStrongest(), data);
         }

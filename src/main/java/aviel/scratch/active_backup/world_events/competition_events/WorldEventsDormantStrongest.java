@@ -23,10 +23,7 @@ public class WorldEventsDormantStrongest implements WorldEvents {
     public WorldEvents onPeerUpdate(ActiveBackupCompetition peer) {
         LOGGER.info("onPeerUpdate({})", peer);
         data.updatePeer(peer);
-        if (!data.amStrongest()) {
-            return new WorldEventsDormantWeak(dormantStrongest.onMetStronger(), data);
-        }
-        return this;
+        return decideFate();
     }
 
     @Override
@@ -40,6 +37,10 @@ public class WorldEventsDormantStrongest implements WorldEvents {
     public WorldEvents onStrengthChange(StrengthModification newStrength) {
         LOGGER.info("onStrengthChange({})", newStrength);
         data.updateSelf(newStrength);
+        return decideFate();
+    }
+
+    private WorldEvents decideFate() {
         if (!data.amStrongest()) {
             return new WorldEventsDormantWeak(dormantStrongest.onMetStronger(), data);
         }
