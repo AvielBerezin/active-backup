@@ -10,8 +10,9 @@ public class EventConcreteData {
     private final long id;
     private int strength;
     private final TopicWriter<ActiveBackupCompetition> activeBackupCompetitionTopicWriter;
-    private final SortedMap<Long, Integer> peersById;
+    private final Map<Long, Integer> peersById;
     private final SortedMap<Integer, SortedSet<Long>> PeersByStrength;
+    private final Map<Long, String> peersToSites;
 
     public EventConcreteData(String site,
                              long id,
@@ -21,14 +22,19 @@ public class EventConcreteData {
         this.id = id;
         this.strength = strength;
         this.activeBackupCompetitionTopicWriter = activeBackupCompetitionTopicWriter;
-        peersById = new TreeMap<>();
+        peersById = new HashMap<>();
         PeersByStrength = new TreeMap<>();
+        peersToSites = new HashMap<>();
     }
 
-    public void updatePeer(long id, int strength) {
-        Integer prevStrength = peersById.put(id, strength);
-        removeAssociatedPeerStrength(id, prevStrength);
-        PeersByStrength.computeIfAbsent(strength, _ -> new TreeSet<>()).add(id);
+    public void updatePeer(ActiveBackupCompetition peer) {
+        Integer prevStrength = peersById.put(peer.id(), peer.strength());
+        removeAssociatedPeerStrength(peer.id(), prevStrength);
+        PeersByStrength.computeIfAbsent(peer.strength(), _ -> new TreeSet<>()).add(peer.id());
+        String prevSite = peersToSites.put(peer.id(), peer.site());
+        if (prevSite != null && !prevSite.equals(peer.site())) {
+            throw new IllegalStateException("peer site cannot change: %s -> %s".formatted(prevSite, peer.site()));
+        }
     }
 
     public void updateSelf(int strength) {
@@ -42,6 +48,7 @@ public class EventConcreteData {
     }
 
     public void removePeer(long id) {
+        peersToSites.remove(id);
         removeAssociatedPeerStrength(id, peersById.remove(id));
     }
 

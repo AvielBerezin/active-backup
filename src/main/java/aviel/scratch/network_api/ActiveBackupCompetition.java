@@ -18,4 +18,8 @@ public class ActiveBackupCompetition {
     public long id() {
         return id;
     }
+
+    public String site() {
+        return site;
+    }
 }

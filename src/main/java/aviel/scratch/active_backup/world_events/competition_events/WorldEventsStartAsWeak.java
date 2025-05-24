@@ -20,7 +20,7 @@ public class WorldEventsStartAsWeak implements WorldEvents {
     @Override
     public WorldEvents onPeerUpdate(ActiveBackupCompetition peer) {
         LOGGER.info("onPeerUpdate({})", peer);
-        data.updatePeer(peer.id(), peer.strength());
+        data.updatePeer(peer);
         if (data.amStrongest()) {
             return new WorldEventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
         }
