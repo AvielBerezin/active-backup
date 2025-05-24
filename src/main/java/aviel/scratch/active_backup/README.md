@@ -32,6 +32,6 @@ the language of the concrete level.
 Those translations are represented by classes that implement the events of the concrete level, while the abstract level
 is help as a field and passed as an argument constructor to the translation.
 
-## code base
+## visual diagram
 
-Here we have
+![image info](./diagram.svg)
