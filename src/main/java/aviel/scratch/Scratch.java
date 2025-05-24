@@ -66,8 +66,8 @@ public class Scratch {
                 }
             })) {
                 abProvider.changeStrength(5);
-                networkApiMock.triggerOnReceivedMessage(new ActiveBackupCompetition(1001L, 10, "site1"));
-                networkApiMock.triggerOnReceivedMessage(new ActiveBackupCompetition(1002L, 10, "site1"));
+                networkApiMock.triggerOnReceivedMessage(new ActiveBackupCompetition(1001L, 20, "site1"));
+                networkApiMock.triggerOnReceivedMessage(new ActiveBackupCompetition(1002L, 20, "site1"));
                 Thread.sleep(6000);
                 networkApiMock.triggerHandOver();
                 Thread.sleep(6000);

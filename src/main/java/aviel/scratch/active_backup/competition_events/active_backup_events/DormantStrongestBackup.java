@@ -23,8 +23,8 @@ public class DormantStrongestBackup implements DormantStrongest {
     }
 
     @Override
-    public WokeStrongest onWakeupCall() {
-        LOGGER.info("onWakeupCall()");
+    public WokeStrongest onWakeUpCall() {
+        LOGGER.info("onWakeUpCall()");
         return new WokeStrongestActive(backup.onActive());
     }
 }

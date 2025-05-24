@@ -27,8 +27,8 @@ public class StatefulWorldEvents {
         worldEvents = worldEvents.onStrengthChange(modification);
     }
 
-    public void onWakeupCall() {
-        worldEvents = worldEvents.onWakeupCall();
+    public void onWakeUpCall() {
+        worldEvents = worldEvents.onWakeUpCall();
     }
 
     public void onTakeANap() {

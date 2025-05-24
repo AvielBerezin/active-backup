@@ -20,9 +20,9 @@ public class ActiveBackupProvider implements AutoCloseable {
 
     private final StatefulWorldEvents events;
     private final TopicReader topicReader;
-    private volatile ScheduledFuture<?> wakeupCallTask;
+    private volatile ScheduledFuture<?> wakeUpCallTask;
     private final ExecutorService activeBackupEventsExecutor;
-    private final ScheduledExecutorService wakeupCallScheduler;
+    private final ScheduledExecutorService wakeUpCallScheduler;
     private final TopicReader handOverConsumer;
 
     public ActiveBackupProvider(NetworkApi networkApi,
@@ -36,13 +36,13 @@ public class ActiveBackupProvider implements AutoCloseable {
             return thread;
         });
         activeBackupEventsExecutor.execute(activeBackupHandler::onBackup);
-        wakeupCallScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        wakeUpCallScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread thread = new Thread(r);
-            thread.setName("wakeupCallScheduler");
+            thread.setName("wakeUpCallScheduler");
             return thread;
         });
-        wakeupCallTask = wakeupCallScheduler.schedule(() -> {
-            activeBackupEventsExecutor.execute(events::onWakeupCall);
+        wakeUpCallTask = wakeUpCallScheduler.schedule(() -> {
+            activeBackupEventsExecutor.execute(events::onWakeUpCall);
         }, 5, TimeUnit.SECONDS);
         topicReader = networkApi.openActiveBackupCompetitionReader(new TopicListener<>() {
             @Override
@@ -64,7 +64,7 @@ public class ActiveBackupProvider implements AutoCloseable {
                 events.onTakeANap();
                 events.onStrengthChange(new StrengthHandOverModification());
             });
-            wakeupCallTask = wakeupCallScheduler.schedule(() -> {
+            wakeUpCallTask = wakeUpCallScheduler.schedule(() -> {
                 activeBackupEventsExecutor.execute(() -> {
                     events.onStrengthChange(new StrengthHandOverRelaxedModification());
                 });
@@ -83,8 +83,8 @@ public class ActiveBackupProvider implements AutoCloseable {
         LOGGER.info("closing provider...");
         topicReader.close();
         handOverConsumer.close();
-        wakeupCallTask.cancel(false);
-        wakeupCallScheduler.close();
+        wakeUpCallTask.cancel(false);
+        wakeUpCallScheduler.close();
         activeBackupEventsExecutor.shutdown();
     }
 }

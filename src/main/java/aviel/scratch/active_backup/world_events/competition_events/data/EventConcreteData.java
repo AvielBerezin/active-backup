@@ -2,10 +2,14 @@ package aviel.scratch.active_backup.world_events.competition_events.data;
 
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import aviel.scratch.network_api.TopicWriter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
 public class EventConcreteData {
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private final String site;
     private final long id;
     private int strength;
@@ -37,13 +41,21 @@ public class EventConcreteData {
     }
 
     public void updateSelf(StrengthModification strength) {
+        int prevStrength = this.strength;
         this.strength = strength.modify(this.strength);
+        LOGGER.info("strength changed: hex({}) -> hex({})", hexInt(prevStrength), hexInt(this.strength));
         activeBackupCompetitionTopicWriter.sendMessage(new ActiveBackupCompetition(id, this.strength, site));
+    }
+
+    private static String hexInt(int prevStrength) {
+        return "%08x".formatted(prevStrength);
     }
 
     public boolean amStrongest() {
         Map.Entry<Integer, SortedSet<Long>> strongestPeers = PeersByStrength.lastEntry();
-        return strongestPeers == null || strongestPeers.getKey() < strength || strongestPeers.getKey() == strength && strongestPeers.getValue().last() < id;
+        return strongestPeers == null ||
+               strongestPeers.getKey() < strength ||
+               strongestPeers.getKey() == strength && strongestPeers.getValue().last() < id;
     }
 
     public void removePeer(long id) {

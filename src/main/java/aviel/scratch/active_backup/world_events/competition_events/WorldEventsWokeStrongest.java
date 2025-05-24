@@ -50,8 +50,8 @@ public class WorldEventsWokeStrongest implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onWakeupCall() {
-        LOGGER.info("onWakeupCall()");
+    public WorldEvents onWakeUpCall() {
+        LOGGER.info("onWakeUpCall()");
         return this;
     }
 

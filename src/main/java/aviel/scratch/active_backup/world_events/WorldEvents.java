@@ -7,6 +7,6 @@ public interface WorldEvents {
     WorldEvents onPeerUpdate(ActiveBackupCompetition peer);
     WorldEvents onPeerLost(long id);
     WorldEvents onStrengthChange(StrengthModification newStrength);
-    WorldEvents onWakeupCall();
+    WorldEvents onWakeUpCall();
     WorldEvents onTakeANap();
 }

@@ -48,9 +48,9 @@ public class WorldEventsDormantWeak implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onWakeupCall() {
-        LOGGER.info("onWakeupCall()");
-        return new WorldEventsWokeWeak(dormantWeak.onWakeupCall(), data);
+    public WorldEvents onWakeUpCall() {
+        LOGGER.info("onWakeUpCall()");
+        return new WorldEventsWokeWeak(dormantWeak.onWakeUpCall(), data);
     }
 
     @Override

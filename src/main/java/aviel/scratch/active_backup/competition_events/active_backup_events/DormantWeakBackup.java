@@ -23,8 +23,8 @@ public class DormantWeakBackup implements DormantWeak {
     }
 
     @Override
-    public WokeWeak onWakeupCall() {
-        LOGGER.info("onWakeupCall()");
+    public WokeWeak onWakeUpCall() {
+        LOGGER.info("onWakeUpCall()");
         return new WokeWeakBackup(backup);
     }
 }
