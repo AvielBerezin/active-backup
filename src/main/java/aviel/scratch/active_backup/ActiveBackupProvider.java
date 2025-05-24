@@ -2,6 +2,7 @@ package aviel.scratch.active_backup;
 
 import aviel.scratch.active_backup.world_events.StatefulWorldEvents;
 import aviel.scratch.active_backup.active_backup_events.StatefulActiveBackup;
+import aviel.scratch.active_backup.world_events.competition_events.EventConcreteData;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import aviel.scratch.network_api.TopicListener;
 import aviel.scratch.network_api.NetworkApi;
@@ -20,8 +21,8 @@ public class ActiveBackupProvider implements AutoCloseable {
     private final ExecutorService activeBackupEventsExecutor;
     private final ScheduledExecutorService wakeupCallScheduler;
 
-    public ActiveBackupProvider(NetworkApi networkApi, long id, int strength, StatefulActiveBackup activeBackupHandler) {
-        events = new StatefulWorldEvents(networkApi.openActiveBackupCompetitionWriter(), id, strength, activeBackupHandler);
+    public ActiveBackupProvider(NetworkApi networkApi, String site, long id, int strength, StatefulActiveBackup activeBackupHandler) {
+        events = new StatefulWorldEvents(activeBackupHandler, new EventConcreteData(site, id, strength, networkApi.openActiveBackupCompetitionWriter()));
         activeBackupEventsExecutor = Executors.newSingleThreadExecutor(r -> {
             Thread thread = new Thread(r);
             thread.setName("activeBackupEventsThread");
@@ -40,7 +41,7 @@ public class ActiveBackupProvider implements AutoCloseable {
             @Override
             public void onReceivedMessage(ActiveBackupCompetition message) {
                 activeBackupEventsExecutor.execute(() -> {
-                    events.onPeerUpdate(message.id(), message.strength());
+                    events.onPeerUpdate(new ActiveBackupCompetition(message.id(), message.strength(), ""));
                 });
             }
 

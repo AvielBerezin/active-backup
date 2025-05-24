@@ -2,6 +2,7 @@ package aviel.scratch.active_backup.world_events.competition_events;
 
 import aviel.scratch.active_backup.world_events.WorldEvents;
 import aviel.scratch.active_backup.competition_events.StartAsWeak;
+import aviel.scratch.network_api.ActiveBackupCompetition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,9 +18,9 @@ public class WorldEventsStartAsWeak implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onPeerUpdate(long id, int strength) {
-        LOGGER.info("onPeerUpdate({}, {})", id, strength);
-        data.updatePeer(id, strength);
+    public WorldEvents onPeerUpdate(ActiveBackupCompetition peer) {
+        LOGGER.info("onPeerUpdate({})", peer);
+        data.updatePeer(peer.id(), peer.strength());
         if (data.amStrongest()) {
             return new WorldEventsStartAsStrongest(startAsWeak.onAmStrongest(), data);
         }

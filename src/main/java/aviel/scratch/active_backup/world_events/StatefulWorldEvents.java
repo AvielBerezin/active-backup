@@ -6,21 +6,16 @@ import aviel.scratch.active_backup.active_backup_events.StatefulActiveBackup;
 import aviel.scratch.active_backup.active_backup_events.stateful.BackupStateful;
 import aviel.scratch.active_backup.competition_events.active_backup_events.StartAsStrongestBackup;
 import aviel.scratch.network_api.ActiveBackupCompetition;
-import aviel.scratch.network_api.TopicWriter;
 
 public class StatefulWorldEvents {
     private WorldEvents worldEvents;
 
-    public StatefulWorldEvents(TopicWriter<ActiveBackupCompetition> activeBackupCompetitionTopicWriter,
-                               long id,
-                               int strength,
-                               StatefulActiveBackup statefulActiveBackup) {
-        worldEvents = new WorldEventsStartAsStrongest(new StartAsStrongestBackup(new BackupStateful(statefulActiveBackup)),
-                                                      new EventConcreteData(id, strength, activeBackupCompetitionTopicWriter));
+    public StatefulWorldEvents(StatefulActiveBackup statefulActiveBackup, EventConcreteData data) {
+        worldEvents = new WorldEventsStartAsStrongest(new StartAsStrongestBackup(new BackupStateful(statefulActiveBackup)), data);
     }
 
-    public void onPeerUpdate(long id, int strength) {
-        worldEvents = worldEvents.onPeerUpdate(id, strength);
+    public void onPeerUpdate(ActiveBackupCompetition peer) {
+        worldEvents = worldEvents.onPeerUpdate(new ActiveBackupCompetition(peer.id(), peer.strength(), ""));
     }
 
     public void onPeerLost(long id) {

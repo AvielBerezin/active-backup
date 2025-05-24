@@ -30,8 +30,8 @@ public final class NetworkApiMock {
         box.get().onWriterLost(id);
     }
 
-    public void triggerOnReceivedMessage(long id, int strength) {
-        box.get().onReceivedMessage(new ActiveBackupCompetition(id, strength));
+    public void triggerOnReceivedMessage(ActiveBackupCompetition message) {
+        box.get().onReceivedMessage(message);
     }
 
     public NetworkApi networkApi() {

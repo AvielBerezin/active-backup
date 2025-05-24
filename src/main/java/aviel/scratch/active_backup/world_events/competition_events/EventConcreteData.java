@@ -6,15 +6,18 @@ import aviel.scratch.network_api.TopicWriter;
 import java.util.*;
 
 public class EventConcreteData {
+    private final String site;
     private final long id;
     private int strength;
     private final TopicWriter<ActiveBackupCompetition> activeBackupCompetitionTopicWriter;
     private final SortedMap<Long, Integer> peersById;
     private final SortedMap<Integer, SortedSet<Long>> PeersByStrength;
 
-    public EventConcreteData(long id,
+    public EventConcreteData(String site,
+                             long id,
                              int strength,
                              TopicWriter<ActiveBackupCompetition> activeBackupCompetitionTopicWriter) {
+        this.site = site;
         this.id = id;
         this.strength = strength;
         this.activeBackupCompetitionTopicWriter = activeBackupCompetitionTopicWriter;
@@ -30,7 +33,7 @@ public class EventConcreteData {
 
     public void updateSelf(int strength) {
         this.strength = strength;
-        activeBackupCompetitionTopicWriter.sendMessage(new ActiveBackupCompetition(id, strength));
+        activeBackupCompetitionTopicWriter.sendMessage(new ActiveBackupCompetition(id, strength, site));
     }
 
     public boolean amStrongest() {
