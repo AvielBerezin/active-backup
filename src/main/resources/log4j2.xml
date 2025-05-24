@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+        <File name="GeneralFileAppender" fileName="logs/general.log">
+            <PatternLayout pattern="%d{dd-MM-yyyy HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </File>
+        <File name="FileAppender" fileName="logs/aviel-scratch.log">
+            <PatternLayout pattern="%d{dd-MM-yyyy HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="GeneralFileAppender" />
+        </Root>
+        <Logger name="aviel.scratch" level="info">
+            <AppenderRef ref="FileAppender" />
+        </Logger>
+        <Logger name="aviel.scratch.Scratch" level="info">
+            <AppenderRef ref="ConsoleAppender" />
+        </Logger>
+    </Loggers>
+</Configuration>
