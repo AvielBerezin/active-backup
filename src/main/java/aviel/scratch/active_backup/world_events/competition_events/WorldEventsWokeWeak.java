@@ -1,9 +1,11 @@
 package aviel.scratch.active_backup.world_events.competition_events;
 
+import aviel.scratch.active_backup.competition_events.DormantWeak;
 import aviel.scratch.active_backup.competition_events.WokeWeak;
 import aviel.scratch.active_backup.world_events.WorldEvents;
 import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthActiveModification;
+import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandOverModification;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import org.apache.logging.log4j.LogManager;
@@ -56,8 +58,13 @@ public class WorldEventsWokeWeak implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onTakeANap() {
+    public WorldEvents onHandOver() {
         LOGGER.info("onTakeANap()");
-        return new WorldEventsDormantWeak(wokeWeak.onTakeANap(), data);
+        DormantWeak dormantWeak = wokeWeak.onTakeANap();
+        data.updateSelf(new StrengthHandOverModification());
+        if (data.amStrongest()) {
+            return new WorldEventsDormantStrongest(dormantWeak.onAmStrongest(), data);
+        }
+        return new WorldEventsDormantWeak(dormantWeak, data);
     }
 }

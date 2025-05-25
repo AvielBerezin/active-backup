@@ -5,6 +5,7 @@ import aviel.scratch.active_backup.world_events.competition_events.data.EventCon
 import aviel.scratch.active_backup.active_backup_events.StatefulActiveBackup;
 import aviel.scratch.active_backup.active_backup_events.stateful.BackupStateful;
 import aviel.scratch.active_backup.competition_events.active_backup_events.DormantStrongestBackup;
+import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandOverModification;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 
@@ -31,7 +32,7 @@ public class StatefulWorldEvents {
         worldEvents = worldEvents.onWakeUpCall();
     }
 
-    public void onTakeANap() {
-        worldEvents = worldEvents.onTakeANap();
+    public void onHandOver() {
+        worldEvents = worldEvents.onHandOver();
     }
 }

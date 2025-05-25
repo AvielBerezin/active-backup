@@ -4,6 +4,7 @@ import aviel.scratch.active_backup.competition_events.WokeStrongest;
 import aviel.scratch.active_backup.world_events.WorldEvents;
 import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthBackupModification;
+import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandOverModification;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import org.apache.logging.log4j.LogManager;
@@ -56,8 +57,8 @@ public class WorldEventsWokeStrongest implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onTakeANap() {
+    public WorldEvents onHandOver() {
         LOGGER.info("onTakeANap()");
-        return this;
+        return this.onStrengthChange(new StrengthHandOverModification());
     }
 }

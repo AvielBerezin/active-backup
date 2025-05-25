@@ -8,5 +8,5 @@ public interface WorldEvents {
     WorldEvents onPeerLost(long id);
     WorldEvents onStrengthChange(StrengthModification newStrength);
     WorldEvents onWakeUpCall();
-    WorldEvents onTakeANap();
+    WorldEvents onHandOver();
 }

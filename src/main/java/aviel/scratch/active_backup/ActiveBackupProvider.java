@@ -61,8 +61,7 @@ public class ActiveBackupProvider implements AutoCloseable {
         });
         handOverConsumer = networkApi.openHandOverProvider(() -> {
             activeBackupEventsExecutor.execute(() -> {
-                events.onTakeANap();
-                events.onStrengthChange(new StrengthHandOverModification());
+                events.onHandOver();
             });
             wakeUpCallTask = wakeUpCallScheduler.schedule(() -> {
                 activeBackupEventsExecutor.execute(() -> {
