@@ -1,6 +1,6 @@
 package aviel.scratch.active_backup.world_events.competition_events;
 
-import aviel.scratch.active_backup.competition_events.WokeStrongest;
+import aviel.scratch.active_backup.competition_events.AwakeStrongest;
 import aviel.scratch.active_backup.world_events.WorldEvents;
 import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthBackupModification;
@@ -10,14 +10,14 @@ import aviel.scratch.network_api.ActiveBackupCompetition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class WorldEventsWokeStrongest implements WorldEvents {
+public class WorldEventsAwakeStrongest implements WorldEvents {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final WokeStrongest wokeStrongest;
+    private final AwakeStrongest awakeStrongest;
     private final EventConcreteData data;
 
-    public WorldEventsWokeStrongest(WokeStrongest wokeStrongest, EventConcreteData data) {
-        this.wokeStrongest = wokeStrongest;
+    public WorldEventsAwakeStrongest(AwakeStrongest awakeStrongest, EventConcreteData data) {
+        this.awakeStrongest = awakeStrongest;
         this.data = data;
     }
 
@@ -45,7 +45,7 @@ public class WorldEventsWokeStrongest implements WorldEvents {
     private WorldEvents decideFate() {
         if (!data.amStrongest()) {
             data.updateSelf(new StrengthBackupModification());
-            return new WorldEventsWokeWeak(wokeStrongest.onMetStronger(), data);
+            return new WorldEventsAwakeWeak(awakeStrongest.onMetStronger(), data);
         }
         return this;
     }

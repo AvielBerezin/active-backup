@@ -51,7 +51,7 @@ public class WorldEventsDormantStrongest implements WorldEvents {
     @Override
     public WorldEvents onWakeUpCall() {
         LOGGER.info("onWakeUpCall()");
-        return new WorldEventsWokeStrongest(dormantStrongest.onWakeUpCall(), data);
+        return new WorldEventsAwakeStrongest(dormantStrongest.onWakeUpCall(), data);
     }
 
     @Override

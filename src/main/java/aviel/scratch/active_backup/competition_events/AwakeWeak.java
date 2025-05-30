@@ -1,6 +1,6 @@
 package aviel.scratch.active_backup.competition_events;
 
-public interface WokeWeak {
+public interface AwakeWeak {
     DormantWeak onTakeANap();
-    WokeStrongest onAmStrongest();
+    AwakeStrongest onAmStrongest();
 }

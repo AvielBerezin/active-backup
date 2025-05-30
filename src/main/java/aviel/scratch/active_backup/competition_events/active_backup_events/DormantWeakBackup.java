@@ -3,7 +3,7 @@ package aviel.scratch.active_backup.competition_events.active_backup_events;
 import aviel.scratch.active_backup.active_backup_events.Backup;
 import aviel.scratch.active_backup.competition_events.DormantStrongest;
 import aviel.scratch.active_backup.competition_events.DormantWeak;
-import aviel.scratch.active_backup.competition_events.WokeWeak;
+import aviel.scratch.active_backup.competition_events.AwakeWeak;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,8 +23,8 @@ public class DormantWeakBackup implements DormantWeak {
     }
 
     @Override
-    public WokeWeak onWakeUpCall() {
+    public AwakeWeak onWakeUpCall() {
         LOGGER.info("onWakeUpCall()");
-        return new WokeWeakBackup(backup);
+        return new AwakeWeakBackup(backup);
     }
 }
