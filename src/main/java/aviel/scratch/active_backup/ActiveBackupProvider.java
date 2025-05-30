@@ -63,7 +63,7 @@ public class ActiveBackupProvider implements AutoCloseable {
 
     public void changeStrength(int userStrengthComponent) {
         activeBackupEventsScheduler.execute(() -> {
-            events.onStrengthChange(new StrengthUserModification(userStrengthComponent));
+            events.onStrengthUpdate(new StrengthUserModification(userStrengthComponent));
         });
     }
 

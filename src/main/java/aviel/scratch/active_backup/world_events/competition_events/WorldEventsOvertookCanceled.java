@@ -24,7 +24,7 @@ public class WorldEventsOvertookCanceled implements WorldEvents {
 
     public static WorldEvents create(OvertookCanceled overtookCanceled, EventConcreteData data) {
         return new WorldEventsOvertookCanceled(overtookCanceled, data)
-                .onStrengthChange(overtookCanceled.activeModification(), overtookCanceled.handoverModification());
+                .onStrengthUpdate(overtookCanceled.activeModification(), overtookCanceled.handoverModification());
     }
 
     @Override
@@ -48,8 +48,8 @@ public class WorldEventsOvertookCanceled implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onStrengthChange(StrengthModification... modifications) {
-        StringJoiner stringJoiner = new StringJoiner(", ", "onStrengthChange(", ")");
+    public WorldEvents onStrengthUpdate(StrengthModification... modifications) {
+        StringJoiner stringJoiner = new StringJoiner(", ", "onStrengthUpdate(", ")");
         for (StrengthModification modification : modifications) {
             stringJoiner.add(modification.toString());
         }

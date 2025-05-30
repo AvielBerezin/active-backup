@@ -26,7 +26,7 @@ public class WorldEventsOvertaking implements WorldEvents {
 
     public static WorldEvents create(Overtaking overtaking, EventConcreteData data, Instant handoverInstant) {
         return new WorldEventsOvertaking(overtaking, data, handoverInstant)
-                .onStrengthChange(overtaking.activeModification(), overtaking.handoverModification());
+                .onStrengthUpdate(overtaking.activeModification(), overtaking.handoverModification());
     }
 
     @Override
@@ -53,8 +53,8 @@ public class WorldEventsOvertaking implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onStrengthChange(StrengthModification... modifications) {
-        StringJoiner stringJoiner = new StringJoiner(", ", "onStrengthChange(", ")");
+    public WorldEvents onStrengthUpdate(StrengthModification... modifications) {
+        StringJoiner stringJoiner = new StringJoiner(", ", "onStrengthUpdate(", ")");
         for (StrengthModification modification : modifications) {
             stringJoiner.add(modification.toString());
         }

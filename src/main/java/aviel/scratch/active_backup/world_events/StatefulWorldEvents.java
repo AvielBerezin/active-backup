@@ -25,8 +25,8 @@ public class StatefulWorldEvents {
         worldEvents = worldEvents.onPeerLost(id);
     }
 
-    public void onStrengthChange(StrengthModification modification) {
-        worldEvents = worldEvents.onStrengthChange(modification);
+    public void onStrengthUpdate(StrengthModification modification) {
+        worldEvents = worldEvents.onStrengthUpdate(modification);
     }
 
     public void onAlarm(Instant triggerTime) {

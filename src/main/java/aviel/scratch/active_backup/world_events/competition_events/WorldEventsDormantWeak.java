@@ -25,7 +25,7 @@ public class WorldEventsDormantWeak implements WorldEvents {
 
     public static WorldEvents create(DormantWeak dormantWeak, EventConcreteData data) {
         return new WorldEventsDormantWeak(dormantWeak, data)
-                .onStrengthChange(dormantWeak.activeModification(), dormantWeak.handoverModification());
+                .onStrengthUpdate(dormantWeak.activeModification(), dormantWeak.handoverModification());
     }
 
     @Override
@@ -43,8 +43,8 @@ public class WorldEventsDormantWeak implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onStrengthChange(StrengthModification... modifications) {
-        StringJoiner stringJoiner = new StringJoiner(", ", "onStrengthChange(", ")");
+    public WorldEvents onStrengthUpdate(StrengthModification... modifications) {
+        StringJoiner stringJoiner = new StringJoiner(", ", "onStrengthUpdate(", ")");
         for (StrengthModification modification : modifications) {
             stringJoiner.add(modification.toString());
         }
@@ -69,6 +69,6 @@ public class WorldEventsDormantWeak implements WorldEvents {
     @Override
     public WorldEvents onHandover(Instant instant) {
         LOGGER.info("onHandover({})", instant);
-        return this.onStrengthChange(new StrengthHandoverModification());
+        return this.onStrengthUpdate(new StrengthHandoverModification());
     }
 }

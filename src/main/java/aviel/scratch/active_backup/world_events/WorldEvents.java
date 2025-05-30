@@ -8,7 +8,7 @@ import java.time.Instant;
 public interface WorldEvents {
     WorldEvents onPeerUpdate(ActiveBackupCompetition peer);
     WorldEvents onPeerLost(long id);
-    WorldEvents onStrengthChange(StrengthModification... modifications);
+    WorldEvents onStrengthUpdate(StrengthModification... modifications);
     WorldEvents onAlarm(Instant triggerInstant);
     WorldEvents onHandover(Instant instant);
 }

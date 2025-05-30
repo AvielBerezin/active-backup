@@ -27,7 +27,7 @@ public class WorldEventsAwakeWeak implements WorldEvents {
 
     public static WorldEvents create(AwakeWeak awakeWeak, EventConcreteData data) {
         return new WorldEventsAwakeWeak(awakeWeak, data)
-                .onStrengthChange(awakeWeak.activeModification(), awakeWeak.handoverModification());
+                .onStrengthUpdate(awakeWeak.activeModification(), awakeWeak.handoverModification());
     }
 
     @Override
@@ -45,8 +45,8 @@ public class WorldEventsAwakeWeak implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onStrengthChange(StrengthModification... modifications) {
-        StringJoiner stringJoiner = new StringJoiner(", ", "onStrengthChange(", ")");
+    public WorldEvents onStrengthUpdate(StrengthModification... modifications) {
+        StringJoiner stringJoiner = new StringJoiner(", ", "onStrengthUpdate(", ")");
         for (StrengthModification modification : modifications) {
             stringJoiner.add(modification.toString());
         }
@@ -74,6 +74,6 @@ public class WorldEventsAwakeWeak implements WorldEvents {
         LOGGER.info("onHandover({})", instant);
         Overtaken overtaken = awakeWeak.onHandover();
         return WorldEventsOvertaken.create(overtaken, data, instant)
-                                   .onStrengthChange(new StrengthHandoverModification());
+                                   .onStrengthUpdate(new StrengthHandoverModification());
     }
 }
