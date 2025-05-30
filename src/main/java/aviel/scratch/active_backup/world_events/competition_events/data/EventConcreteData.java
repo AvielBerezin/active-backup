@@ -25,6 +25,7 @@ public class EventConcreteData {
      * this counts all strengths that are 0b10 at the state bits.
      */
     private int overtakenPeerCount;
+    private boolean isAwake;
 
     public EventConcreteData(long id, TopicWriter<ActiveBackupCompetition> selfTopicWriter) {
         this.id = id;
@@ -34,6 +35,7 @@ public class EventConcreteData {
         peersByStrength = new TreeMap<>();
         activePeersByStrength = new TreeMap<>();
         weekPeersCount = 0;
+        isAwake = false;
     }
 
     public int myStrength() {
@@ -77,8 +79,15 @@ public class EventConcreteData {
         }
     }
 
-    public void selfPublish() {
-        selfTopicWriter.sendMessage(new ActiveBackupCompetition(id, strength));
+    public void wakeUp() {
+        isAwake = true;
+        selfPublish();
+    }
+
+    private void selfPublish() {
+        if (isAwake) {
+            selfTopicWriter.sendMessage(new ActiveBackupCompetition(id, strength));
+        }
     }
 
     public boolean amStrongest() {
