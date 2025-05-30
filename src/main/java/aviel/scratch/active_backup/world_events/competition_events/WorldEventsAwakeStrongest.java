@@ -56,7 +56,6 @@ public class WorldEventsAwakeStrongest implements WorldEvents {
 
     private WorldEvents decideFate() {
         if (!data.amStrongest()) {
-            data.updateSelf(new StrengthBackupModification());
             return WorldEventsAwakeWeak.create(awakeStrongest.onMetStronger(), data);
         }
         return this;
