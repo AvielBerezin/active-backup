@@ -9,7 +9,7 @@ public final class StrengthUserModification implements StrengthModification {
 
     @Override
     public int modify(int strength) {
-        return (userComponent << 2) | (strength & 0b11);
+        return (userComponent << USER_POSITION) | (strength & (0b11 << STATE_POSITION));
     }
 
     @Override

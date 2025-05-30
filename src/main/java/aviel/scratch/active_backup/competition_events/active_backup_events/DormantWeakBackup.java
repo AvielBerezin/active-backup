@@ -24,7 +24,7 @@ public class DormantWeakBackup implements DormantWeak {
 
     @Override
     public AwakeWeak onWakeUp() {
-        LOGGER.info("onWakeUpCall()");
+        LOGGER.info("onWakeUp()");
         return new AwakeWeakBackup(backup);
     }
 }

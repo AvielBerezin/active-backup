@@ -1,15 +1,18 @@
 package aviel.scratch.active_backup.world_events.competition_events;
 
-import aviel.scratch.active_backup.competition_events.DormantWeak;
 import aviel.scratch.active_backup.competition_events.AwakeWeak;
+import aviel.scratch.active_backup.competition_events.Overtaken;
 import aviel.scratch.active_backup.world_events.WorldEvents;
 import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthActiveModification;
-import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandOverModification;
+import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandoverModification;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.time.Instant;
+import java.util.StringJoiner;
 
 public class WorldEventsAwakeWeak implements WorldEvents {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -17,9 +20,14 @@ public class WorldEventsAwakeWeak implements WorldEvents {
     private final AwakeWeak awakeWeak;
     private final EventConcreteData data;
 
-    public WorldEventsAwakeWeak(AwakeWeak awakeWeak, EventConcreteData data) {
+    private WorldEventsAwakeWeak(AwakeWeak awakeWeak, EventConcreteData data) {
         this.awakeWeak = awakeWeak;
         this.data = data;
+    }
+
+    public static WorldEvents create(AwakeWeak awakeWeak, EventConcreteData data) {
+        return new WorldEventsAwakeWeak(awakeWeak, data)
+                .onStrengthChange(awakeWeak.activeModification(), awakeWeak.handoverModification());
     }
 
     @Override
@@ -37,34 +45,35 @@ public class WorldEventsAwakeWeak implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onStrengthChange(StrengthModification newStrength) {
-        LOGGER.info("onStrengthChange({})", newStrength);
-        data.updateSelf(newStrength);
+    public WorldEvents onStrengthChange(StrengthModification... modifications) {
+        StringJoiner stringJoiner = new StringJoiner(", ", "onStrengthChange(", ")");
+        for (StrengthModification modification : modifications) {
+            stringJoiner.add(modification.toString());
+        }
+        LOGGER.info(stringJoiner);
+        data.updateSelf(modifications);
         return decideFate();
     }
 
     private WorldEvents decideFate() {
         if (data.amStrongest()) {
             data.updateSelf(new StrengthActiveModification());
-            return new WorldEventsAwakeStrongest(awakeWeak.onAmStrongest(), data);
+            return WorldEventsAwakeStrongest.create(awakeWeak.onAmStrongest(), data);
         }
         return this;
     }
 
     @Override
-    public WorldEvents onWakeUpCall() {
-        LOGGER.info("onWakeUpCall()");
+    public WorldEvents onAlarm(Instant triggerInstant) {
+        LOGGER.info("onAlarm({})", triggerInstant);
         return this;
     }
 
     @Override
-    public WorldEvents onHandOver() {
-        LOGGER.info("onTakeANap()");
-        DormantWeak dormantWeak = awakeWeak.onTakeANap();
-        data.updateSelf(new StrengthHandOverModification());
-        if (data.amStrongest()) {
-            return new WorldEventsDormantStrongest(dormantWeak.onAmStrongest(), data);
-        }
-        return new WorldEventsDormantWeak(dormantWeak, data);
+    public WorldEvents onHandover(Instant instant) {
+        LOGGER.info("onHandover({})", instant);
+        Overtaken overtaken = awakeWeak.onHandover();
+        return WorldEventsOvertaken.create(overtaken, data, instant)
+                                   .onStrengthChange(new StrengthHandoverModification());
     }
 }

@@ -7,7 +7,7 @@ public class NetworkApi {
         return new TopicReader();
     }
 
-    public TopicReader openHandOverProvider(Runnable handOverImplementation) {
+    public TopicReader openHandoverProvider(Runnable handOverImplementation) {
         return new TopicReader();
     }
 

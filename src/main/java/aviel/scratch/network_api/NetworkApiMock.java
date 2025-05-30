@@ -29,12 +29,12 @@ public final class NetworkApiMock {
             }
 
             @Override
-            public TopicReader openHandOverProvider(Runnable handOverImplementation) {
+            public TopicReader openHandoverProvider(Runnable handOverImplementation) {
                 if (handOverUserAction.get() != null) {
-                    throw new IllegalStateException("HandOverProvider can only be opened once");
+                    throw new IllegalStateException("HandoverProvider can only be opened once");
                 }
                 handOverUserAction.set(handOverImplementation);
-                return super.openHandOverProvider(handOverImplementation);
+                return super.openHandoverProvider(handOverImplementation);
             }
         };
         return new NetworkApiMock(instance, activeBackupCompetition, handOverUserAction);
@@ -48,7 +48,7 @@ public final class NetworkApiMock {
         activeBackupCompetition.get().onReceivedMessage(message);
     }
 
-    public void triggerHandOver() {
+    public void triggerHandover() {
         handOverUserAction.get().run();
     }
 

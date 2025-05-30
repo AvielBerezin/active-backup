@@ -1,9 +1,8 @@
 package aviel.scratch.active_backup.world_events.competition_events;
 
+import aviel.scratch.active_backup.competition_events.Overtaking;
 import aviel.scratch.active_backup.world_events.WorldEvents;
-import aviel.scratch.active_backup.competition_events.DormantWeak;
 import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
-import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandoverModification;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import org.apache.logging.log4j.LogManager;
@@ -12,34 +11,45 @@ import org.apache.logging.log4j.Logger;
 import java.time.Instant;
 import java.util.StringJoiner;
 
-public class WorldEventsDormantWeak implements WorldEvents {
+public class WorldEventsOvertaking implements WorldEvents {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final DormantWeak dormantWeak;
+    private final Overtaking overtaking;
     private final EventConcreteData data;
+    private final Instant handoverInstant;
 
-    private WorldEventsDormantWeak(DormantWeak dormantWeak, EventConcreteData data) {
-        this.dormantWeak = dormantWeak;
+    private WorldEventsOvertaking(Overtaking overtaking, EventConcreteData data, Instant handoverInstant) {
+        this.overtaking = overtaking;
         this.data = data;
+        this.handoverInstant = handoverInstant;
     }
 
-    public static WorldEvents create(DormantWeak dormantWeak, EventConcreteData data) {
-        return new WorldEventsDormantWeak(dormantWeak, data)
-                .onStrengthChange(dormantWeak.activeModification(), dormantWeak.handoverModification());
+    public static WorldEvents create(Overtaking overtaking, EventConcreteData data, Instant handoverInstant) {
+        return new WorldEventsOvertaking(overtaking, data, handoverInstant)
+                .onStrengthChange(overtaking.activeModification(), overtaking.handoverModification());
     }
 
     @Override
     public WorldEvents onPeerUpdate(ActiveBackupCompetition peer) {
         LOGGER.info("onPeerUpdate({})", peer);
         data.updatePeer(peer);
-        return decideFate();
+        if (!data.amStrongest()) {
+            return WorldEventsOvertaken.create(overtaking.onMetStronger(), data, handoverInstant);
+        }
+        if (data.noWeek()) {
+            return WorldEventsOvertook.create(overtaking.onAmStrongestNoWeek(), data);
+        }
+        return this;
     }
 
     @Override
     public WorldEvents onPeerLost(long id) {
         LOGGER.info("onPeerLost({})", id);
         data.removePeer(id);
-        return decideFate();
+        if (data.noWeek()) {
+            return WorldEventsOvertook.create(overtaking.onAmStrongestNoWeek(), data);
+        }
+        return this;
     }
 
     @Override
@@ -50,12 +60,8 @@ public class WorldEventsDormantWeak implements WorldEvents {
         }
         LOGGER.info(stringJoiner);
         data.updateSelf(modifications);
-        return decideFate();
-    }
-
-    private WorldEvents decideFate() {
-        if (data.amStrongest()) {
-            return WorldEventsDormantStrongest.create(dormantWeak.onAmStrongest(), data);
+        if (!data.amStrongest()) {
+            return WorldEventsOvertaken.create(overtaking.onMetStronger(), data, handoverInstant);
         }
         return this;
     }
@@ -63,12 +69,15 @@ public class WorldEventsDormantWeak implements WorldEvents {
     @Override
     public WorldEvents onAlarm(Instant triggerInstant) {
         LOGGER.info("onAlarm({})", triggerInstant);
-        return WorldEventsAwakeWeak.create(dormantWeak.onWakeUp(), data);
+        if (handoverInstant.equals(triggerInstant)) {
+            return WorldEventsOvertook.create(overtaking.onAmStrongestOvertakingTooLong(), data);
+        }
+        return this;
     }
 
     @Override
     public WorldEvents onHandover(Instant instant) {
         LOGGER.info("onHandover({})", instant);
-        return this.onStrengthChange(new StrengthHandoverModification());
+        return this;
     }
 }

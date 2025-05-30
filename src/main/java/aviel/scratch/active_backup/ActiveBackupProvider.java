@@ -3,16 +3,12 @@ package aviel.scratch.active_backup;
 import aviel.scratch.active_backup.world_events.StatefulWorldEvents;
 import aviel.scratch.active_backup.active_backup_events.StatefulActiveBackup;
 import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
-import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandOverModification;
-import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandOverRelaxedModification;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthUserModification;
-import aviel.scratch.network_api.ActiveBackupCompetition;
-import aviel.scratch.network_api.TopicListener;
-import aviel.scratch.network_api.NetworkApi;
-import aviel.scratch.network_api.TopicReader;
+import aviel.scratch.network_api.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.Instant;
 import java.util.concurrent.*;
 
 public class ActiveBackupProvider implements AutoCloseable {
@@ -21,58 +17,52 @@ public class ActiveBackupProvider implements AutoCloseable {
     private final StatefulWorldEvents events;
     private final TopicReader topicReader;
     private volatile ScheduledFuture<?> wakeUpCallTask;
-    private final ExecutorService activeBackupEventsExecutor;
-    private final ScheduledExecutorService wakeUpCallScheduler;
+    private final ScheduledExecutorService activeBackupEventsScheduler;
     private final TopicReader handOverConsumer;
 
     public ActiveBackupProvider(NetworkApi networkApi,
-                                String site,
                                 long id,
                                 StatefulActiveBackup activeBackupHandler) {
-        events = new StatefulWorldEvents(activeBackupHandler, new EventConcreteData(site, id, networkApi.openActiveBackupCompetitionWriter()));
-        activeBackupEventsExecutor = Executors.newSingleThreadExecutor(r -> {
+        activeBackupEventsScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread thread = new Thread(r);
             thread.setName("activeBackupEventsThread");
             return thread;
         });
-        activeBackupEventsExecutor.execute(activeBackupHandler::onBackup);
-        wakeUpCallScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread thread = new Thread(r);
-            thread.setName("wakeUpCallScheduler");
-            return thread;
-        });
-        wakeUpCallTask = wakeUpCallScheduler.schedule(() -> {
-            activeBackupEventsExecutor.execute(events::onWakeUpCall);
+        TopicWriter<ActiveBackupCompetition> selfTopicWriter = networkApi.openActiveBackupCompetitionWriter();
+        events = new StatefulWorldEvents(activeBackupHandler, new EventConcreteData(id, selfTopicWriter));
+        Instant startupInstant = Instant.now();
+        activeBackupEventsScheduler.execute(activeBackupHandler::onBackup);
+        wakeUpCallTask = activeBackupEventsScheduler.schedule(() -> {
+            activeBackupEventsScheduler.execute(() -> events.onAlarm(startupInstant));
         }, 5, TimeUnit.SECONDS);
         topicReader = networkApi.openActiveBackupCompetitionReader(new TopicListener<>() {
             @Override
             public void onReceivedMessage(ActiveBackupCompetition message) {
-                activeBackupEventsExecutor.execute(() -> {
-                    events.onPeerUpdate(new ActiveBackupCompetition(message.id(), message.strength(), ""));
+                activeBackupEventsScheduler.execute(() -> {
+                    events.onPeerUpdate(new ActiveBackupCompetition(message.id(), message.strength()));
                 });
             }
 
             @Override
             public void onWriterLost(long id) {
-                activeBackupEventsExecutor.execute(() -> {
+                activeBackupEventsScheduler.execute(() -> {
                     events.onPeerLost(id);
                 });
             }
         });
-        handOverConsumer = networkApi.openHandOverProvider(() -> {
-            activeBackupEventsExecutor.execute(() -> {
-                events.onHandOver();
-            });
-            wakeUpCallTask = wakeUpCallScheduler.schedule(() -> {
-                activeBackupEventsExecutor.execute(() -> {
-                    events.onStrengthChange(new StrengthHandOverRelaxedModification());
+        handOverConsumer = networkApi.openHandoverProvider(() -> {
+            Instant handoverInstant = Instant.now();
+            activeBackupEventsScheduler.execute(() -> events.onHandover(handoverInstant));
+            wakeUpCallTask = activeBackupEventsScheduler.schedule(() -> {
+                activeBackupEventsScheduler.execute(() -> {
+                    events.onAlarm(handoverInstant);
                 });
-            }, 5, TimeUnit.SECONDS);
+            }, 4, TimeUnit.SECONDS);
         });
     }
 
     public void changeStrength(int userStrengthComponent) {
-        activeBackupEventsExecutor.execute(() -> {
+        activeBackupEventsScheduler.execute(() -> {
             events.onStrengthChange(new StrengthUserModification(userStrengthComponent));
         });
     }
@@ -83,7 +73,6 @@ public class ActiveBackupProvider implements AutoCloseable {
         topicReader.close();
         handOverConsumer.close();
         wakeUpCallTask.cancel(false);
-        wakeUpCallScheduler.close();
-        activeBackupEventsExecutor.shutdown();
+        activeBackupEventsScheduler.close();
     }
 }

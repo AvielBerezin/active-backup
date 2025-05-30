@@ -1,5 +1,6 @@
 package aviel.scratch.active_backup.world_events.competition_events.data;
 
+import aviel.scratch.Utils;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import aviel.scratch.network_api.TopicWriter;
 import org.apache.logging.log4j.LogManager;
@@ -10,66 +11,120 @@ import java.util.*;
 public class EventConcreteData {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final String site;
     private final long id;
     private int strength;
-    private final TopicWriter<ActiveBackupCompetition> activeBackupCompetitionTopicWriter;
-    private final Map<Long, Integer> peersById;
-    private final SortedMap<Integer, SortedSet<Long>> PeersByStrength;
-    private final Map<Long, String> peersToSites;
+    private final TopicWriter<ActiveBackupCompetition> selfTopicWriter;
+    private final Map<Long, ActiveBackupCompetition> peersById;
+    private final SortedMap<Integer, SortedMap<Long, ActiveBackupCompetition>> peersByStrength;
+    private final SortedMap<Integer, SortedMap<Long, ActiveBackupCompetition>> activePeersByStrength;
+    /**
+     * this counts all strengths that are 0b00 at the state bits.
+     */
+    private int weekPeersCount;
+    /**
+     * this counts all strengths that are 0b10 at the state bits.
+     */
+    private int overtakenPeerCount;
 
-    public EventConcreteData(String site,
-                             long id,
-                             TopicWriter<ActiveBackupCompetition> activeBackupCompetitionTopicWriter) {
-        this.site = site;
+    public EventConcreteData(long id, TopicWriter<ActiveBackupCompetition> selfTopicWriter) {
         this.id = id;
         this.strength = 0;
-        this.activeBackupCompetitionTopicWriter = activeBackupCompetitionTopicWriter;
+        this.selfTopicWriter = selfTopicWriter;
         peersById = new HashMap<>();
-        PeersByStrength = new TreeMap<>();
-        peersToSites = new HashMap<>();
+        peersByStrength = new TreeMap<>();
+        activePeersByStrength = new TreeMap<>();
+        weekPeersCount = 0;
+    }
+
+    public int myStrength() {
+        return strength;
     }
 
     public void updatePeer(ActiveBackupCompetition peer) {
-        Integer prevStrength = peersById.put(peer.id(), peer.strength());
-        removeAssociatedPeerStrength(peer.id(), prevStrength);
-        PeersByStrength.computeIfAbsent(peer.strength(), _ -> new TreeSet<>()).add(peer.id());
-        String prevSite = peersToSites.put(peer.id(), peer.site());
-        if (prevSite != null && !prevSite.equals(peer.site())) {
-            throw new IllegalStateException("peer site cannot change: %s -> %s".formatted(prevSite, peer.site()));
+        ActiveBackupCompetition prev = peersById.put(peer.id(), peer);
+        if (prev != null) {
+            removeAssociatedPeerStrength(prev);
+            if (prev.isWeek()) {
+                weekPeersCount -= 1;
+            }
+            if (prev.isOvertaken()) {
+                overtakenPeerCount -= 1;
+            }
+        }
+        peersByStrength.computeIfAbsent(peer.strength(), _ -> new TreeMap<>()).put(peer.id(), peer);
+        if (peer.isActive()) {
+            activePeersByStrength.computeIfAbsent(peer.strength(), _ -> new TreeMap<>()).put(peer.id(), peer);
+        }
+        if (peer.isWeek()) {
+            weekPeersCount += 1;
+        }
+        if (peer.isOvertaken()) {
+            overtakenPeerCount += 1;
         }
     }
 
-    public void updateSelf(StrengthModification strength) {
-        int prevStrength = this.strength;
-        this.strength = strength.modify(this.strength);
-        LOGGER.info("strength changed: hex({}) -> hex({})", hexInt(prevStrength), hexInt(this.strength));
-        activeBackupCompetitionTopicWriter.sendMessage(new ActiveBackupCompetition(id, this.strength, site));
-    }
-
-    private static String hexInt(int prevStrength) {
-        return "%08x".formatted(prevStrength);
+    public void updateSelf(StrengthModification ...modifications) {
+        int prev = strength;
+        for (StrengthModification modification : modifications) {
+            int prevStrength = strength;
+            strength = modification.modify(strength);
+            if (prevStrength != strength) {
+                LOGGER.info("strength changed: hex({}) -> hex({}) via {}", Utils.hexInt(prevStrength), Utils.hexInt(strength), modification);
+            }
+        }
+        if (prev != strength) {
+            selfTopicWriter.sendMessage(new ActiveBackupCompetition(id, strength));
+        }
     }
 
     public boolean amStrongest() {
-        Map.Entry<Integer, SortedSet<Long>> strongestPeers = PeersByStrength.lastEntry();
+        Map.Entry<Integer, SortedMap<Long, ActiveBackupCompetition>> strongestPeers = peersByStrength.lastEntry();
         return strongestPeers == null ||
                strongestPeers.getKey() < strength ||
-               strongestPeers.getKey() == strength && strongestPeers.getValue().last() < id;
+               strongestPeers.getKey() == strength && strongestPeers.getValue().lastKey() < id;
+    }
+
+    public boolean metActiveStronger() {
+        Map.Entry<Integer, SortedMap<Long, ActiveBackupCompetition>> strongestPeers = activePeersByStrength.lastEntry();
+        return strongestPeers != null &&
+               (strongestPeers.getKey() > strength ||
+                (strongestPeers.getKey() == strength && strongestPeers.getValue().lastKey() > id));
     }
 
     public void removePeer(long id) {
-        peersToSites.remove(id);
-        removeAssociatedPeerStrength(id, peersById.remove(id));
+        ActiveBackupCompetition prev = peersById.remove(id);
+        if (prev == null) {
+            return;
+        }
+        removeAssociatedPeerStrength(prev);
+        if (prev.isWeek()) {
+            weekPeersCount -= 1;
+        }
+        if (prev.isOvertaken()) {
+            overtakenPeerCount -= 1;
+        }
     }
 
-    private void removeAssociatedPeerStrength(long id, Integer prevStrength) {
-        if (prevStrength != null) {
-            Set<Long> strengths = PeersByStrength.get(prevStrength);
-            strengths.remove(id);
-            if (strengths.isEmpty()) {
-                PeersByStrength.remove(prevStrength);
+    private void removeAssociatedPeerStrength(ActiveBackupCompetition prev) {
+        SortedMap<Long, ActiveBackupCompetition> strengths = peersByStrength.get(prev.strength());
+        strengths.remove(prev.id());
+        if (strengths.isEmpty()) {
+            peersByStrength.remove(prev.strength());
+        }
+        if (prev.isActive()) {
+            SortedMap<Long, ActiveBackupCompetition> activeStrengths = activePeersByStrength.get(prev.strength());
+            activeStrengths.remove(prev.id());
+            if (activeStrengths.isEmpty()) {
+                activePeersByStrength.remove(prev.strength());
             }
         }
+    }
+
+    public boolean noWeek() {
+        return weekPeersCount == 0;
+    }
+
+    public boolean noOvertaken() {
+        return overtakenPeerCount == 0;
     }
 }

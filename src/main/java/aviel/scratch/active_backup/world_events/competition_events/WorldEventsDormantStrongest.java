@@ -3,11 +3,14 @@ package aviel.scratch.active_backup.world_events.competition_events;
 import aviel.scratch.active_backup.world_events.WorldEvents;
 import aviel.scratch.active_backup.competition_events.DormantStrongest;
 import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
-import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandOverModification;
+import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandoverModification;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.time.Instant;
+import java.util.StringJoiner;
 
 public class WorldEventsDormantStrongest implements WorldEvents {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -15,9 +18,14 @@ public class WorldEventsDormantStrongest implements WorldEvents {
     private final DormantStrongest dormantStrongest;
     private final EventConcreteData data;
 
-    public WorldEventsDormantStrongest(DormantStrongest dormantStrongest, EventConcreteData data) {
+    private WorldEventsDormantStrongest(DormantStrongest dormantStrongest, EventConcreteData data) {
         this.dormantStrongest = dormantStrongest;
         this.data = data;
+    }
+
+    public static WorldEvents create(DormantStrongest dormantStrongest, EventConcreteData data) {
+        return new WorldEventsDormantStrongest(dormantStrongest, data)
+                .onStrengthChange(dormantStrongest.activeModification(), dormantStrongest.handoverModification());
     }
 
     @Override
@@ -35,28 +43,32 @@ public class WorldEventsDormantStrongest implements WorldEvents {
     }
 
     @Override
-    public WorldEvents onStrengthChange(StrengthModification newStrength) {
-        LOGGER.info("onStrengthChange({})", newStrength);
-        data.updateSelf(newStrength);
+    public WorldEvents onStrengthChange(StrengthModification... modifications) {
+        StringJoiner stringJoiner = new StringJoiner(", ", "onStrengthChange(", ")");
+        for (StrengthModification modification : modifications) {
+            stringJoiner.add(modification.toString());
+        }
+        LOGGER.info(stringJoiner);
+        data.updateSelf(modifications);
         return decideFate();
     }
 
     private WorldEvents decideFate() {
         if (!data.amStrongest()) {
-            return new WorldEventsDormantWeak(dormantStrongest.onMetStronger(), data);
+            return WorldEventsDormantWeak.create(dormantStrongest.onMetStronger(), data);
         }
         return this;
     }
 
     @Override
-    public WorldEvents onWakeUpCall() {
-        LOGGER.info("onWakeUpCall()");
-        return new WorldEventsAwakeStrongest(dormantStrongest.onWakeUp(), data);
+    public WorldEvents onAlarm(Instant triggerInstant) {
+        LOGGER.info("onAlarm({})", triggerInstant);
+        return WorldEventsAwakeStrongest.create(dormantStrongest.onWakeUp(), data);
     }
 
     @Override
-    public WorldEvents onHandOver() {
-        LOGGER.info("onTakeANap()");
-        return this.onStrengthChange(new StrengthHandOverModification());
+    public WorldEvents onHandover(Instant instant) {
+        LOGGER.info("onHandover({})", instant);
+        return this.onStrengthChange(new StrengthHandoverModification());
     }
 }

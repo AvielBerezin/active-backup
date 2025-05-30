@@ -5,19 +5,20 @@ import aviel.scratch.active_backup.world_events.competition_events.data.EventCon
 import aviel.scratch.active_backup.active_backup_events.StatefulActiveBackup;
 import aviel.scratch.active_backup.active_backup_events.stateful.BackupStateful;
 import aviel.scratch.active_backup.competition_events.active_backup_events.DormantStrongestBackup;
-import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandOverModification;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
 import aviel.scratch.network_api.ActiveBackupCompetition;
+
+import java.time.Instant;
 
 public class StatefulWorldEvents {
     private WorldEvents worldEvents;
 
     public StatefulWorldEvents(StatefulActiveBackup statefulActiveBackup, EventConcreteData data) {
-        worldEvents = new WorldEventsDormantStrongest(new DormantStrongestBackup(new BackupStateful(statefulActiveBackup)), data);
+        worldEvents = WorldEventsDormantStrongest.create(new DormantStrongestBackup(new BackupStateful(statefulActiveBackup)), data);
     }
 
     public void onPeerUpdate(ActiveBackupCompetition peer) {
-        worldEvents = worldEvents.onPeerUpdate(new ActiveBackupCompetition(peer.id(), peer.strength(), ""));
+        worldEvents = worldEvents.onPeerUpdate(new ActiveBackupCompetition(peer.id(), peer.strength()));
     }
 
     public void onPeerLost(long id) {
@@ -28,11 +29,11 @@ public class StatefulWorldEvents {
         worldEvents = worldEvents.onStrengthChange(modification);
     }
 
-    public void onWakeUpCall() {
-        worldEvents = worldEvents.onWakeUpCall();
+    public void onAlarm(Instant triggerTime) {
+        worldEvents = worldEvents.onAlarm(triggerTime);
     }
 
-    public void onHandOver() {
-        worldEvents = worldEvents.onHandOver();
+    public void onHandover(Instant instant) {
+        worldEvents = worldEvents.onHandover(instant);
     }
 }

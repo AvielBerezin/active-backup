@@ -1,9 +1,9 @@
 package aviel.scratch.active_backup.world_events.competition_events.data;
 
-public final class StrengthActiveModification implements StrengthModification {
+public final class StrengthActiveModification implements StrengthActiveStateModification {
     @Override
     public int modify(int strength) {
-        return strength | 0b1;
+        return strength | (1 << ACTIVE_POSITION);
     }
 
     @Override
