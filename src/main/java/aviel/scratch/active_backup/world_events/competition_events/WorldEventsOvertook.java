@@ -61,6 +61,9 @@ public class WorldEventsOvertook implements WorldEvents {
         if (data.metActiveStronger()) {
             return WorldEventsOvertookCanceled.create(overtook.onMetActiveStronger(), data);
         }
+        if (data.noOvertaken()) {
+            return WorldEventsAwakeStrongest.create(overtook.onNoOvertaken(), data);
+        }
         return this;
     }
 
