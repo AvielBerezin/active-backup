@@ -1,6 +1,9 @@
 package aviel.scratch.active_backup.competition_events;
 
-public interface DormantWeak {
+import aviel.scratch.active_backup.competition_events.meta.BackupState;
+import aviel.scratch.active_backup.competition_events.meta.NoHandoverState;
+
+public interface DormantWeak extends NoHandoverState, BackupState {
     DormantStrongest onAmStrongest();
-    AwakeWeak onWakeUpCall();
+    AwakeWeak onWakeUp();
 }
