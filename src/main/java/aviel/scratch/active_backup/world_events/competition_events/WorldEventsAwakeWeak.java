@@ -71,8 +71,6 @@ public class WorldEventsAwakeWeak implements WorldEvents {
     @Override
     public WorldEvents onHandover(Instant instant) {
         LOGGER.info("onHandover({})", instant);
-        Overtaken overtaken = awakeWeak.onHandover();
-        return WorldEventsOvertaken.create(overtaken, data, instant)
-                                   .onStrengthUpdate(new StrengthHandoverModification());
+        return WorldEventsOvertaken.create(awakeWeak.onHandover(), data, instant);
     }
 }

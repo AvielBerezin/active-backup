@@ -70,6 +70,6 @@ public class WorldEventsAwakeStrongest implements WorldEvents {
     @Override
     public WorldEvents onHandover(Instant instant) {
         LOGGER.info("onHandover({})", instant);
-        return this.onStrengthUpdate(new StrengthHandoverModification());
+        return this;
     }
 }
