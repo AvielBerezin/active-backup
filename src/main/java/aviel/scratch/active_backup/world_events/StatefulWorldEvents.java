@@ -13,8 +13,8 @@ import java.time.Instant;
 public class StatefulWorldEvents {
     private WorldEvents worldEvents;
 
-    public StatefulWorldEvents(StatefulActiveBackup statefulActiveBackup, EventConcreteData data) {
-        worldEvents = WorldEventsDormantStrongest.create(new DormantStrongestBackup(new BackupStateful(statefulActiveBackup)), data);
+    public StatefulWorldEvents(StatefulActiveBackup statefulActiveBackup, EventConcreteData data, Runnable onWakingUp) {
+        worldEvents = WorldEventsDormantStrongest.create(new DormantStrongestBackup(new BackupStateful(statefulActiveBackup), onWakingUp), data);
     }
 
     public void onPeerUpdate(ActiveBackupCompetition peer) {

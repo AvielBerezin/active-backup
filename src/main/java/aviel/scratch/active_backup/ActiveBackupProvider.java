@@ -29,7 +29,8 @@ public class ActiveBackupProvider implements AutoCloseable {
             return thread;
         });
         TopicWriter<ActiveBackupCompetition> selfTopicWriter = networkApi.openActiveBackupCompetitionWriter();
-        events = new StatefulWorldEvents(activeBackupHandler, new EventConcreteData(id, selfTopicWriter));
+        EventConcreteData data = new EventConcreteData(id, selfTopicWriter);
+        events = new StatefulWorldEvents(activeBackupHandler, data, data::selfPublish);
         Instant startupInstant = Instant.now();
         activeBackupEventsScheduler.execute(activeBackupHandler::onBackup);
         wakeUpCallTask = activeBackupEventsScheduler.schedule(() -> {

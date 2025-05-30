@@ -11,20 +11,23 @@ public class DormantWeakBackup implements DormantWeak {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final Backup backup;
+    private final Runnable onWakingUp;
 
-    public DormantWeakBackup(Backup backup) {
+    public DormantWeakBackup(Backup backup, Runnable onWakingUp) {
         this.backup = backup;
+        this.onWakingUp = onWakingUp;
     }
 
     @Override
     public DormantStrongest onAmStrongest() {
         LOGGER.info("onAmStrongest()");
-        return new DormantStrongestBackup(backup);
+        return new DormantStrongestBackup(backup, onWakingUp);
     }
 
     @Override
     public AwakeWeak onWakeUp() {
         LOGGER.info("onWakeUp()");
+        onWakingUp.run();
         return new AwakeWeakBackup(backup);
     }
 }

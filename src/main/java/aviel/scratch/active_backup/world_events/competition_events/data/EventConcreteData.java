@@ -73,8 +73,12 @@ public class EventConcreteData {
             }
         }
         if (prev != strength) {
-            selfTopicWriter.sendMessage(new ActiveBackupCompetition(id, strength));
+            selfPublish();
         }
+    }
+
+    public void selfPublish() {
+        selfTopicWriter.sendMessage(new ActiveBackupCompetition(id, strength));
     }
 
     public boolean amStrongest() {
