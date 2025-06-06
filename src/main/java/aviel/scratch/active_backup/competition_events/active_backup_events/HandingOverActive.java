@@ -7,14 +7,12 @@ import aviel.scratch.active_backup.competition_events.HandingOver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.Instant;
-
-public class AwakeStrongestActive implements AwakeStrongest {
+public class HandingOverActive implements HandingOver {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final Active active;
 
-    public AwakeStrongestActive(Active active) {
+    public HandingOverActive(Active active) {
         this.active = active;
     }
 
@@ -25,8 +23,8 @@ public class AwakeStrongestActive implements AwakeStrongest {
     }
 
     @Override
-    public HandingOver onHandover(Instant handoverInstant) {
-        LOGGER.info("onHandover()");
-        return new HandingOverActive(active);
+    public AwakeStrongest onHandoverTooLong() {
+        LOGGER.info("onHandoverTooLong()");
+        return new AwakeStrongestActive(active);
     }
 }

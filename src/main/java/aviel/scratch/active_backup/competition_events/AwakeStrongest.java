@@ -1,8 +1,11 @@
 package aviel.scratch.active_backup.competition_events;
 
 import aviel.scratch.active_backup.competition_events.meta.ActiveState;
-import aviel.scratch.active_backup.competition_events.meta.NoHandoverState;
+import aviel.scratch.active_backup.competition_events.meta.HandoverState;
 
-public interface AwakeStrongest extends NoHandoverState, ActiveState {
-    AwakeWeak onMetStronger();
+import java.time.Instant;
+
+public interface AwakeStrongest extends HandoverState, ActiveState {
+    AwakeWeak onMetActiveStronger();
+    HandingOver onHandover(Instant handoverInstant);
 }

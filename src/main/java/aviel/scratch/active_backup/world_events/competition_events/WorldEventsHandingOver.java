@@ -1,6 +1,6 @@
 package aviel.scratch.active_backup.world_events.competition_events;
 
-import aviel.scratch.active_backup.competition_events.AwakeStrongest;
+import aviel.scratch.active_backup.competition_events.HandingOver;
 import aviel.scratch.active_backup.world_events.WorldEvents;
 import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
@@ -11,20 +11,22 @@ import org.apache.logging.log4j.Logger;
 import java.time.Instant;
 import java.util.StringJoiner;
 
-public class WorldEventsAwakeStrongest implements WorldEvents {
+public class WorldEventsHandingOver implements WorldEvents {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final AwakeStrongest awakeStrongest;
+    private final HandingOver handingOverActive;
     private final EventConcreteData data;
+    private final Instant instant;
 
-    private WorldEventsAwakeStrongest(AwakeStrongest awakeStrongest, EventConcreteData data) {
-        this.awakeStrongest = awakeStrongest;
+    private WorldEventsHandingOver(HandingOver handingOverActive, EventConcreteData data, Instant instant) {
+        this.handingOverActive = handingOverActive;
         this.data = data;
+        this.instant = instant;
     }
 
-    public static WorldEvents create(AwakeStrongest awakeStrongest, EventConcreteData data) {
-        return new WorldEventsAwakeStrongest(awakeStrongest, data)
-                .onStrengthUpdate(awakeStrongest.activeModification(), awakeStrongest.handoverModification());
+    public static WorldEvents create(HandingOver handingOverActive, EventConcreteData data, Instant instant) {
+        return new WorldEventsHandingOver(handingOverActive, data, instant)
+                .onStrengthUpdate(handingOverActive.activeModification(), handingOverActive.handoverModification());
     }
 
     @Override
@@ -54,7 +56,7 @@ public class WorldEventsAwakeStrongest implements WorldEvents {
 
     private WorldEvents decideFate() {
         if (data.metActiveStronger()) {
-            return WorldEventsAwakeWeak.create(awakeStrongest.onMetActiveStronger(), data);
+            return WorldEventsAwakeWeak.create(handingOverActive.onMetActiveStronger(), data);
         }
         return this;
     }
@@ -62,12 +64,15 @@ public class WorldEventsAwakeStrongest implements WorldEvents {
     @Override
     public WorldEvents onAlarm(Instant triggerInstant) {
         LOGGER.info("onAlarm({})", triggerInstant);
+        if (instant.equals(triggerInstant)) {
+            return WorldEventsAwakeStrongest.create(handingOverActive.onHandoverTooLong(), data);
+        }
         return this;
     }
 
     @Override
     public WorldEvents onHandover(Instant instant) {
         LOGGER.info("onHandover({})", instant);
-        return WorldEventsHandingOver.create(awakeStrongest.onHandover(instant), data, instant);
+        return create(handingOverActive, data, instant);
     }
 }
