@@ -5,5 +5,4 @@ import aviel.scratch.active_backup.competition_events.meta.NoHandoverState;
 
 public interface AwakeWeak extends NoHandoverState, BackupState {
     AwakeStrongest onAmStrongest();
-    Overtaken onHandover();
 }

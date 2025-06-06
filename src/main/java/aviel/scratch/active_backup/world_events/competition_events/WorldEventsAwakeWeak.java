@@ -1,11 +1,8 @@
 package aviel.scratch.active_backup.world_events.competition_events;
 
 import aviel.scratch.active_backup.competition_events.AwakeWeak;
-import aviel.scratch.active_backup.competition_events.Overtaken;
 import aviel.scratch.active_backup.world_events.WorldEvents;
 import aviel.scratch.active_backup.world_events.competition_events.data.EventConcreteData;
-import aviel.scratch.active_backup.world_events.competition_events.data.StrengthActiveModification;
-import aviel.scratch.active_backup.world_events.competition_events.data.StrengthHandoverModification;
 import aviel.scratch.active_backup.world_events.competition_events.data.StrengthModification;
 import aviel.scratch.network_api.ActiveBackupCompetition;
 import org.apache.logging.log4j.LogManager;
@@ -71,6 +68,6 @@ public class WorldEventsAwakeWeak implements WorldEvents {
     @Override
     public WorldEvents onHandover(Instant instant) {
         LOGGER.info("onHandover({})", instant);
-        return WorldEventsOvertaken.create(awakeWeak.onHandover(), data, instant);
+        return this;
     }
 }
